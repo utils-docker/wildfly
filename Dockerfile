@@ -1,9 +1,9 @@
 FROM frolvlad/alpine-oraclejdk8:slim
 MAINTAINER Fábio Luciano <fabioluciano@php.net>
-LABEL Description="Install Wildfly"
+LABEL Description="Install Wildfly 10.1.0.Final"
 
 # Set some variables to continue with the build process
-ENV WILDFLY_VERSION="9.0.1.Final"
+ENV WILDFLY_VERSION="10.1.0.Final"
 ENV DOWNLOAD_URL="http://download.jboss.org/wildfly/"$WILDFLY_VERSION"/wildfly-"$WILDFLY_VERSION".tar.gz"
 ENV PASSWORD="senha"
 

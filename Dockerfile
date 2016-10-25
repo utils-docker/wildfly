@@ -20,7 +20,8 @@ RUN apk update \
   && curl -L $DOWNLOAD_URL > wildfly.tar.gz \
   && directory=$(tar tfz wildfly.tar.gz --exclude '*/*') \
   && tar -xzf wildfly.tar.gz && rm wildfly.tar.gz \
-  && mv $directory wildfly
+  && mv $directory wildfly \
+  && chown wildfly:wildfly /opt/wildfly -R
 
 COPY files/* /etc/
 

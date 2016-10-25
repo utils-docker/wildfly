@@ -4,14 +4,15 @@ LABEL Description="Install Wildfly 10.1.0.Final"
 
 # Set some variables to continue with the build process
 ENV WILDFLY_VERSION="10.1.0.Final"
-ENV DOWNLOAD_URL="http://download.jboss.org/wildfly/"$WILDFLY_VERSION"/wildfly-"$WILDFLY_VERSION".tar.gz"
-ENV PASSWORD="senha"
+ENV DOWNLOAD_URL="http://download.jboss.org/wildfly/"$WILDFLY_VERSION"/wildfly-"$WILDFLY_VERSION".tar.gz" \
+    SSH_PASSWORD="password" \
+    KEYSTORE_PASSWORD='password'
 
 WORKDIR /opt
 
 RUN apk update \
   && apk --update --no-cache add tar curl openssh supervisor \
-  && printf "$PASSWORD\n$PASSWORD" | adduser wildfly \
+  && printf "$SSH_PASSWORD\n$SSH_PASSWORD" | adduser wildfly \
   && printf "\n\n" | ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key \
   && printf "\n\n" | ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key \
   && printf "\n\n" | ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key \
@@ -20,7 +21,13 @@ RUN apk update \
   && curl -L $DOWNLOAD_URL > wildfly.tar.gz \
   && directory=$(tar tfz wildfly.tar.gz --exclude '*/*') \
   && tar -xzf wildfly.tar.gz && rm wildfly.tar.gz \
-  && mv $directory wildfly \
+  && mv $directory wildfly
+
+WORKDIR /opt/wildfly
+
+RUN printf "localhost\n\n\n\n\n\nyes\n" | keytool -genkeypair -alias serverkey -keyalg RSA -keysize 2048 -validity 7360 -keystore standalone/configuration/server.keystore -keypass $KEYSTORE_PASSWORD -storepass $KEYSTORE_PASSWORD \
+  && sed -i '/<security-realm name="ApplicationRealm">/a <server-identities><ssl><keystore path="server.keystore" relative-to="jboss.server.config.dir" keystore-password="'$KEYSTORE_PASSWORD'" alias="serverkey" key-password="'$KEYSTORE_PASSWORD'"\/></ssl></server-identities>' standalone/configuration/standalone.xml \
+  && sed -i '/<http-listener name="default" socket-binding="http" redirect-socket="https"\/>/a <https-listener name="httpsServer" socket-binding="https" security-realm="ApplicationRealm" \/>' standalone/configuration/standalone.xml \
   && chown wildfly:wildfly /opt/wildfly -R
 
 COPY files/* /etc/

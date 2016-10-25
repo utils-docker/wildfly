@@ -26,8 +26,8 @@ RUN apk update \
 WORKDIR /opt/wildfly
 
 RUN printf "localhost\n\n\n\n\n\nyes\n" | keytool -genkeypair -alias serverkey -keyalg RSA -keysize 2048 -validity 7360 -keystore  /opt/wildfly/standalone/configuration/server.keystore -keypass $KEYSTORE_PASSWORD -storepass $KEYSTORE_PASSWORD \
-  && sed -i '/<security-realm name="ApplicationRealm">/a <server-identities><ssl><keystore path="server.keystore" relative-to="jboss.server.config.dir" keystore-password="'$KEYSTORE_PASSWORD'" alias="serverkey" key-password="'$KEYSTORE_PASSWORD'"\/></ssl></server-identities>' /opt/wildfly/standalone/configuration/standalone.xml \
-  && sed -i '/<http-listener name="default" socket-binding="http" redirect-socket="https"\/>/a <https-listener name="httpsServer" socket-binding="https" security-realm="ApplicationRealm" \/>' /opt/wildfly/standalone/configuration/standalone.xml \
+  && sed -i '/<security-realm name="ApplicationRealm">/a <server-identities><ssl><keystore path="server.keystore" relative-to="jboss.server.config.dir" keystore-password="'$KEYSTORE_PASSWORD'" alias="serverkey" key-password="'$KEYSTORE_PASSWORD'"\/></ssl></server-identities>' standalone/configuration/standalone.xml \
+  && sed -i '/<http-listener name="default" socket-binding="http" redirect-socket="https"\/>/a <https-listener name="httpsServer" socket-binding="https" security-realm="ApplicationRealm" \/>' standalone/configuration/standalone.xml \
   && chown wildfly:wildfly /opt/wildfly -R
 
 COPY files/* /etc/

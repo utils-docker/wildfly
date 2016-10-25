@@ -11,7 +11,7 @@ WORKDIR /opt
 
 RUN apk update \
   && apk --update --no-cache add tar curl openssh supervisor \
-  && printf "$PASSWORD\n$PASSWORD" | adduser wildfly \
+  && printf "$SVN_PASSWORD\n$SVN_PASSWORD" | adduser wildfly \
   && printf "\n\n" | ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key \
   && printf "\n\n" | ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key \
   && printf "\n\n" | ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key \
